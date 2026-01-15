@@ -156,6 +156,198 @@
       display: none;
     }
 
+    /* iOS 安装引导气泡 */
+    .ios-install-guide {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .ios-install-guide.hidden {
+      display: none;
+    }
+
+    .ios-guide-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px 20px;
+      max-width: 350px;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+
+    .ios-guide-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    .ios-guide-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .ios-guide-text {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .ios-guide-steps {
+      text-align: left;
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .ios-guide-steps ol {
+      margin: 0;
+      padding-left: 20px;
+      color: #555;
+      line-height: 1.8;
+    }
+
+    .ios-guide-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 40px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* 箭头动画 */
+    .guide-arrow {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      font-size: 50px;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Android 安装提示卡片 */
+    .android-install-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      z-index: 10001;
+      text-align: center;
+      animation: scaleIn 0.3s ease;
+    }
+
+    .android-install-card.hidden {
+      display: none;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .android-card-icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    .android-card-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .android-card-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .android-card-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .android-card-cancel {
+      background: transparent;
+      color: #999;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    /* 遮罩层 */
+    .install-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+    }
+
+    .install-overlay.hidden {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -196,6 +388,38 @@
       <span>📲</span>
       <span>安装应用</span>
     </button>
+
+    <!-- iOS 安装引导 -->
+    <div id="iosInstallGuide" class="ios-install-guide hidden">
+      <div class="ios-guide-content">
+        <div class="ios-guide-icon">📱</div>
+        <div class="ios-guide-title">安装到主屏幕</div>
+        <div class="ios-guide-text">
+          将此应用添加到主屏幕，获得像原生应用一样的体验！
+        </div>
+        <div class="ios-guide-steps">
+          <ol>
+            <li>点击屏幕底部的<strong>分享按钮</strong> <span style="font-size: 20px;">⎋</span></li>
+            <li>向下滑动找到<strong>"添加到主屏幕"</strong></li>
+            <li>点击<strong>"添加"</strong>完成安装</li>
+          </ol>
+        </div>
+        <button class="ios-guide-button" onclick="closeIOSGuide()">我知道了</button>
+      </div>
+      <div class="guide-arrow">👇</div>
+    </div>
+
+    <!-- Android 安装提示卡片 -->
+    <div id="installOverlay" class="install-overlay hidden" onclick="closeAndroidCard()"></div>
+    <div id="androidInstallCard" class="android-install-card hidden">
+      <div class="android-card-icon">🎉</div>
+      <div class="android-card-title">安装此应用？</div>
+      <div class="android-card-text">
+        将"日期倒计时"安装到您的设备，获得更流畅的使用体验！
+      </div>
+      <button class="android-card-button" onclick="installApp()">立即安装</button>
+      <button class="android-card-cancel" onclick="closeAndroidCard()">暂不安装</button>
+    </div>
   </div>
 
   <!-- Vue 3 -->
@@ -341,55 +565,164 @@
       });
     }
 
-    // PWA 安装提示逻辑
+    // ========== 智能安装引导系统 ==========
+
+    // 检测设备类型和操作系统
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+    // 检查是否已经显示过引导（使用 localStorage）
+    const guideStorageKey = 'install_guide_shown';
+    const hasShownGuide = localStorage.getItem(guideStorageKey);
+
+    // 关闭引导的函数
+    window.closeIOSGuide = function() {
+      document.getElementById('iosInstallGuide').classList.add('hidden');
+      // 标记已显示过，避免频繁打扰
+      localStorage.setItem(guideStorageKey, 'ios');
+    };
+
+    window.closeAndroidCard = function() {
+      document.getElementById('androidInstallCard').classList.add('hidden');
+      document.getElementById('installOverlay').classList.add('hidden');
+      // 标记已显示过
+      localStorage.setItem(guideStorageKey, 'android');
+    };
+
+    // iOS 安装引导逻辑
+    if (isIOS && !isStandalone && !hasShownGuide) {
+      // 延迟 3 秒显示引导，让用户先看到页面内容
+      setTimeout(() => {
+        document.getElementById('iosInstallGuide').classList.remove('hidden');
+      }, 3000);
+    }
+
+    // PWA 安装提示逻辑（Android/Chrome）
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
+    const androidInstallCard = document.getElementById('androidInstallCard');
+    const installOverlay = document.getElementById('installOverlay');
 
     window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('✅ 检测到可以安装 PWA');
+
       // 阻止默认的安装提示
       e.preventDefault();
       // 保存事件以便后续触发
       deferredPrompt = e;
-      // 显示安装按钮
-      installButton.classList.remove('hidden');
-      console.log('PWA 安装事件已触发');
+
+      // 如果是 Android 且没有显示过引导，显示卡片式提示
+      if (isAndroid && !hasShownGuide) {
+        setTimeout(() => {
+          androidInstallCard.classList.remove('hidden');
+          installOverlay.classList.remove('hidden');
+        }, 2000);
+      } else {
+        // 其他情况显示浮动按钮
+        installButton.classList.remove('hidden');
+      }
     });
 
     // 安装按钮点击事件
     window.installApp = async () => {
+      // 隐藏所有提示
+      installButton.classList.add('hidden');
+      androidInstallCard.classList.add('hidden');
+      installOverlay.classList.add('hidden');
+
       if (deferredPrompt) {
         // 显示安装提示
         deferredPrompt.prompt();
         // 等待用户响应
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`用户${outcome === 'accepted' ? '接受' : '拒绝'}了安装`);
+        console.log(`用户${outcome === 'accepted' ? '✅ 接受' : '❌ 拒绝'}了安装`);
+
         // 清除 deferredPrompt
         deferredPrompt = null;
-        // 隐藏安装按钮
-        installButton.classList.add('hidden');
+      } else {
+        // 如果没有 deferredPrompt，可能是 iOS 或其他不支持 PWA 的浏览器
+        if (isIOS) {
+          // iOS 显示引导
+          document.getElementById('iosInstallGuide').classList.remove('hidden');
+        } else {
+          // 其他浏览器提示
+          vant.showToast({
+            message: '请使用浏览器菜单中的"添加到主屏幕"功能',
+            icon: 'info-o',
+            duration: 3000
+          });
+        }
       }
     };
 
     // 检测应用是否已安装
     window.addEventListener('appinstalled', () => {
-      // 应用已安装，隐藏安装按钮
+      // 应用已安装，隐藏所有安装提示
       installButton.classList.add('hidden');
-      console.log('PWA 已安装');
+      androidInstallCard.classList.add('hidden');
+      installOverlay.classList.add('hidden');
+      document.getElementById('iosInstallGuide').classList.add('hidden');
+
+      console.log('🎉 PWA 已安装');
+
+      // 清除引导标记，允许再次显示（如果用户卸载后重装）
+      localStorage.removeItem(guideStorageKey);
+
       vant.showToast({
-        message: '安装成功！',
+        message: '✅ 安装成功！',
         icon: 'success',
+        duration: 2000
       });
     });
 
     // 页面加载后检查是否可以安装
     window.addEventListener('load', () => {
       // 检查是否已经在独立模式下运行（已安装）
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('应用正在以独立模式运行');
+      if (isStandalone) {
+        console.log('✅ 应用正在以独立模式运行（已安装）');
       } else {
-        console.log('应用未安装，等待 beforeinstallprompt 事件');
+        console.log('📱 应用未安装');
+        if (isIOS) {
+          console.log('🍎 检测到 iOS 设备，将显示 iOS 安装引导');
+        } else if (isAndroid) {
+          console.log('🤖 检测到 Android 设备，等待 beforeinstallprompt 事件');
+        } else {
+          console.log('💻 检测到桌面设备');
+        }
+      }
+
+      // 每次访问时检查是否显示引导（如果之前拒绝过，可以设置为 7 天后再次提示）
+      const lastShown = localStorage.getItem(guideStorageKey);
+      if (lastShown) {
+        const daysSinceShown = (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24);
+        if (daysSinceShown > 7) {
+          // 7 天后清除标记，可以再次提示
+          localStorage.removeItem(guideStorageKey);
+        }
       }
     });
+
+    // 监听页面可见性变化，如果用户从桌面图标打开，记录下来
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // 页面被隐藏
+        localStorage.setItem('lastVisit', Date.now().toString());
+      }
+    });
+
+    // ========== 注册 Service Worker (PWA) ==========
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('✅ ServiceWorker 注册成功:', registration.scope);
+          })
+          .catch(error => {
+            console.log('❌ ServiceWorker 注册失败:', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>
