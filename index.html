@@ -376,7 +376,7 @@
 <body>
   <div id="app">
     <div class="container">
-      <h1 class="title">📅 日期倒计时</h1>
+      <h1 class="title" onclick="refreshPage()" >📅 日期倒计时</h1>
 
       <!-- 页面底部地址栏 -->
       <div class="page-footer">
@@ -385,7 +385,7 @@
       </div>
 
       <div class="form-group">
-        <span class="label" onclick="refreshPage()" style="cursor: pointer;" title="点击刷新页面">选择日期</span>
+        <span class="label" style="cursor: pointer;" title="点击刷新页面">选择日期</span>
         <van-field
           v-model="selectedDate"
           readonly
