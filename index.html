@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>日期倒计时</title>
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="倒计时">
+  <!-- Android Chrome PWA 优化 -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Vant 4 CSS -->
+  <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4/lib/index.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100vh;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .result-card {
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 15px;
+      color: white;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .result-title {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .result-days {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .result-date {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .vant-field {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .vant-field .van-field__control {
+      font-size: 24px;
+      color: #5557d5;
+      font-weight: 500;
+    }
+
+    .vant-field .van-field__control::placeholder {
+      color: #999;
+      font-size: 16px;
+    }
+
+    .install-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 25px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      cursor: pointer;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .install-button:active {
+      transform: scale(0.95);
+    }
+
+    /* 隐藏安装按钮 */
+    .install-button.hidden {
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="container">
+      <h1 class="title">📅 日期倒计时</h1>
+
+      <div class="form-group">
+        <span class="label">选择日期</span>
+        <van-field
+          v-model="selectedDate"
+          readonly
+          clickable
+          placeholder="请选择日期"
+          @click="openCalendar"
+          class="vant-field"
+        />
+      </div>
+
+      <div class="result-card" v-if="result !== null">
+        <div class="result-title">距离 {{ resultDate }} 还有</div>
+        <div class="result-days">{{ result }} 天</div>
+        <div class="result-date">目标日期: {{ resultDate }}</div>
+      </div>
+
+      <!-- 日历弹出层 -->
+      <van-calendar
+        v-model:show="showCalendar"
+        @confirm="onConfirm"
+        :min-date="minDate"
+        :max-date="maxDate"
+        color="#764ba2"
+      />
+    </div>
+
+    <!-- 安装按钮 -->
+    <button id="installButton" class="install-button hidden" onclick="installApp()">
+      <span>📲</span>
+      <span>安装应用</span>
+    </button>
+  </div>
+
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- Vant 4 JS -->
+  <script src="https://fastly.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+  <!-- 农历计算库 -->
+  <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.js"></script>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    const app = createApp({
+      setup() {
+        const showCalendar = ref(false);
+        const selectedDate = ref('');
+        const result = ref(null);
+        const resultDate = ref('');
+        const minDate = ref(new Date(2020, 0, 1));
+        const maxDate = ref(new Date(2030, 11, 31));
+
+        // 计算下一个农历大年初一
+        const getNextLunarNewYear = () => {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = today.getMonth() + 1;
+          const day = today.getDate();
+
+          // 农历新年日期表（按年份）
+          const lunarNewYearDates = {
+            2025: { year: 2025, month: 1, day: 29 },  // 2025年春节
+            2026: { year: 2026, month: 2, day: 17 },  // 2026年春节
+            2027: { year: 2027, month: 2, day: 6 },   // 2027年春节
+            2028: { year: 2028, month: 1, day: 26 },  // 2028年春节
+            2029: { year: 2029, month: 2, day: 13 },  // 2029年春节
+            2030: { year: 2030, month: 2, day: 3 }    // 2030年春节
+          };
+
+          // 检查今年的春节是否已经过去
+          const thisYearSpringFestival = lunarNewYearDates[year];
+
+          if (thisYearSpringFestival) {
+            const springFestivalDate = new Date(
+              thisYearSpringFestival.year,
+              thisYearSpringFestival.month - 1,
+              thisYearSpringFestival.day
+            );
+
+            // 如果今年的春节还没到，返回今年的春节
+            if (today < springFestivalDate) {
+              return thisYearSpringFestival;
+            }
+          }
+
+          // 今年的春节已经过了，返回明年的春节
+          const nextYear = year + 1;
+          if (lunarNewYearDates[nextYear]) {
+            return lunarNewYearDates[nextYear];
+          }
+
+          // 如果没有预定义，使用默认估算（明年2月中旬）
+          return { year: nextYear, month: 2, day: 15 };
+        };
+
+        // 格式化日期
+        const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        };
+
+        // 确认日期选择
+        const onConfirm = (date) => {
+          selectedDate.value = formatDate(date);
+          showCalendar.value = false;
+          // 选择日期后自动计算
+          calculateDays();
+        };
+
+        // 打开日历
+        const openCalendar = () => {
+          showCalendar.value = true;
+        };
+
+        // 计算剩余天数
+        const calculateDays = () => {
+          if (!selectedDate.value) {
+            return;
+          }
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const target = new Date(selectedDate.value);
+          target.setHours(0, 0, 0, 0);
+
+          const diffTime = target - today;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          result.value = diffDays;
+          resultDate.value = selectedDate.value;
+        };
+
+        // 设置默认日期为明年农历大年初一
+        onMounted(() => {
+          const nextLunarNewYear = getNextLunarNewYear();
+          const defaultDate = new Date(nextLunarNewYear.year, nextLunarNewYear.month - 1, nextLunarNewYear.day);
+          selectedDate.value = formatDate(defaultDate);
+          // 页面加载后自动计算
+          calculateDays();
+        });
+
+        return {
+          showCalendar,
+          selectedDate,
+          result,
+          resultDate,
+          minDate,
+          maxDate,
+          onConfirm,
+          openCalendar,
+        };
+      }
+    });
+
+    // 注册 Vant 组件
+    app.use(vant);
+
+    // 挂载应用
+    app.mount('#app');
+
+    // 注册 Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('ServiceWorker 注册成功:', registration.scope);
+          })
+          .catch(error => {
+            console.log('ServiceWorker 注册失败:', error);
+          });
+      });
+    }
+
+    // PWA 安装提示逻辑
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // 阻止默认的安装提示
+      e.preventDefault();
+      // 保存事件以便后续触发
+      deferredPrompt = e;
+      // 显示安装按钮
+      installButton.classList.remove('hidden');
+      console.log('PWA 安装事件已触发');
+    });
+
+    // 安装按钮点击事件
+    window.installApp = async () => {
+      if (deferredPrompt) {
+        // 显示安装提示
+        deferredPrompt.prompt();
+        // 等待用户响应
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`用户${outcome === 'accepted' ? '接受' : '拒绝'}了安装`);
+        // 清除 deferredPrompt
+        deferredPrompt = null;
+        // 隐藏安装按钮
+        installButton.classList.add('hidden');
+      }
+    };
+
+    // 检测应用是否已安装
+    window.addEventListener('appinstalled', () => {
+      // 应用已安装，隐藏安装按钮
+      installButton.classList.add('hidden');
+      console.log('PWA 已安装');
+      vant.showToast({
+        message: '安装成功！',
+        icon: 'success',
+      });
+    });
+
+    // 页面加载后检查是否可以安装
+    window.addEventListener('load', () => {
+      // 检查是否已经在独立模式下运行（已安装）
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('应用正在以独立模式运行');
+      } else {
+        console.log('应用未安装，等待 beforeinstallprompt 事件');
+      }
+    });
+  </script>
+</body>
+</html>
