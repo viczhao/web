@@ -1,0 +1,13 @@
+# 生成图标相关的文件
+generate-icons.html
+generate_icons.py
+icon.svg
+
+# macOS 系统文件
+.DS_Store
+*.swp
+*.swo
+
+# 编辑器配置
+.vscode
+.idea
