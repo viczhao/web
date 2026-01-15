@@ -733,9 +733,12 @@
       }
 
       // 显示当前页面 URL
-      const currentUrl = window.location.href;
-      document.getElementById('pageUrl').textContent = currentUrl;
-      console.log('🔗 当前页面地址:', currentUrl);
+      const pageUrlElement = document.getElementById('pageUrl');
+      if (pageUrlElement) {
+        const currentUrl = window.location.href;
+        pageUrlElement.textContent = currentUrl;
+        console.log('🔗 当前页面地址:', currentUrl);
+      }
     });
 
     // 监听页面可见性变化，如果用户从桌面图标打开，记录下来
@@ -748,15 +751,13 @@
 
     // ========== 注册 Service Worker (PWA) ==========
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(registration => {
-            console.log('✅ ServiceWorker 注册成功:', registration.scope);
-          })
-          .catch(error => {
-            console.log('❌ ServiceWorker 注册失败:', error);
-          });
-      });
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('✅ ServiceWorker 注册成功:', registration.scope);
+        })
+        .catch(error => {
+          console.log('❌ ServiceWorker 注册失败:', error);
+        });
     }
   </script>
 </body>
